@@ -1,0 +1,1 @@
+This repository is the daemon to handle texting. Notice config.h is not included as this is the authentication details. It simply has a bunch of #define's. You will need to change the #include paths as well since they are for my filesystem. This daemon is made for UNIX systems; I run it on my FreeBSD server.
