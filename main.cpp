@@ -159,7 +159,7 @@ int main()
   cout << "MySQL initialized." << endl;
   
   //connect to database
-  if(!mysql_real_connect(&mysql, "assassins.myprotosite.com", "assassins", "elvesandoreos", "assassins", 0, NULL, 0))
+  if(!mysql_real_connect(&mysql, "assassins.myprotosite.com", "assassins", "password", "assassins", 0, NULL, 0))
   {
     cout << mysql_errno(&mysql) << ": " << mysql_error(&mysql) << endl;
   	return -1;
