@@ -1,0 +1,87 @@
+<?php
+include_once("config.php");
+include_once("security.php");
+
+$errors = "";
+$missing_required = "";
+
+function error($errors, $message)
+{
+	if($errors == "")
+		$errors .= $message;
+	else
+		$errors .= "<br>" . $message;
+	return $errors;
+}
+
+function missing_required($missing_required, $field)
+{
+	if($missing_required == "")
+		$missing_required = "Missing required fields: " . $field;
+	else
+		$missing_required .= ", " . $field;
+	return $missing_required;
+}
+
+if($_POST['create'] == "true")
+{
+	$name = $_POST['game_name'];
+	
+	// Check for errors
+	
+	//check if required fields are entered
+	if($name == "")
+	{
+		$missing_required = missing_required($missing_required, "Name");
+	}
+	else if(strlen($name) < 2)
+	{
+		$errors = error($errors, "Game name must be at least 2 characters long.");
+	}
+	else
+	{
+		//check if game name used
+		$query = sprintf("SELECT * FROM games WHERE name='%s'", $name);
+		$result = mysql_query($query);
+		if(mysql_num_rows($result) == 1)
+			$errors = error($errors, "Game name is already used.");
+	}
+	
+	//if no errors, insert user into DB and register the optional tag to user
+	if($errors == "" && $missing_required == "")
+	{
+		// To protect SQL injection (more detail about SQL injection)
+		$name = stripslashes($name);
+		$name = mysql_real_escape_string($name);
+		
+		$query = sprintf("SELECT * FROM sessions WHERE sessionid='%s'", $sessionid);
+		$result = mysql_query($query);
+		$row = mysql_fetch_assoc($result);
+		$adminid = $row['userid'];
+		
+		//create game
+		$query = sprintf("INSERT INTO games (name, adminid) VALUES ('%s', %d)", $name, $adminid);
+		$result = mysql_query($query);
+		header("Location: /");
+	}
+}
+?>
+
+<html>
+	<head>
+		<title>Assassins of the Spoon - Register</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+	</head>
+	
+	<body>
+		<a href="/">Home</a><br>
+		<br>
+		<form action="create.php" method="POST">
+			Tournament Name:<br>
+			<input type="text" name="game_name" /><br>
+			<input type="hidden" name="create" value="true" />
+			<input type="submit" value="Create" /><br>
+			Note: You will not automatically join this tournament upon creation. You must join manually.
+		</form>
+	</body>
+</html>
